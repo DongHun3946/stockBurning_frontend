@@ -51,23 +51,13 @@ export default {
   font-size: 16px;
   color: #ffffff;
   background-color: #464646;
-  /* 상자 배경색 */
   border-radius: 30px;
-  /* 테두리 둥글게 */
-  padding: 1% 5%;
-  /* 내부 여백 */
-  width: 95%;
-  /* 상자 너비 */
+  padding: 2% 5% 2% 5%;
+  width: 100%;
   max-width: 100%;
-  /* 부모 요소를 초과하지 않도록 제한 */
   text-align: left;
-  /* 텍스트 왼쪽 정렬 */
-  margin: 1% auto 0;
-  /* 좌우 여백 자동 */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-  /* 그림자 추가 */
   box-sizing: border-box;
-  /* padding 포함하여 너비 계산 */
 }
 
 table {
@@ -87,7 +77,7 @@ thead {
 }
 
 tr {
-  border-bottom: 1px solid #cccccc;
+  border-bottom: 1px solid #b8b8b8;
 }
 
 td img {

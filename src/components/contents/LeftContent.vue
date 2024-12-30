@@ -36,7 +36,7 @@
     gap: 20px; 
     /* background-color: #f76060; */
     border-radius: 30px; 
-    padding: 3%; 
+    padding: 10px; 
     height: 25%;
     width: 100%; 
     text-align: left; 
@@ -44,9 +44,9 @@
   }
   .bottom {
     display: flex; 
-    /* background-color: #464646; */
+    /* background-color: #b9e672; */
     border-radius: 30px;
-    padding: 7px;
+    padding: 10px;
     height: 75%;
     width: 100%; 
     text-align: left;

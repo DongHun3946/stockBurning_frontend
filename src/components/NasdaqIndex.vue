@@ -79,10 +79,9 @@ export default {
     color: #ffffff;
     background-color: #464646; 
     border-radius: 30px; 
-    padding: 3% 0% 0% 4%; /* 내부 여백 */
+    padding: 2% 3% 2% 3%; 
     width: 50%; 
     text-align: left; 
-    margin: 1% auto 0; /* 좌우 여백 자동 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
     line-height: 0.6; 
     box-sizing: border-box;

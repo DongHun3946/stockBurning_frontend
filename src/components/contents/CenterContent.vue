@@ -27,12 +27,12 @@
   
   <style scoped>
   .center-content {
-    background-color: rgb(185, 169, 255); 
+    /* background-color: rgb(185, 169, 255); */
     flex: 1.5;
   }
   .top{
     border-radius: 30px;
-    background-color: #ffa1a1; 
+    /* background-color: #ffa1a1; */
     padding: 10px; 
     height: 50%;
     width: 100%; 
@@ -43,7 +43,7 @@
     display: flex; /*StockInfo.vue와 HotSearch.vue를 가로로 배치*/ 
     justify-content: space-between; 
     gap: 20px;     /*StockInfo.vue와 HotSearch.vue 사이 간격*/ 
-    background-color: #68e9a2;  
+    /* background-color: #68e9a2; */ 
     border-radius: 30px; 
     padding: 10px; 
     height: 50%;

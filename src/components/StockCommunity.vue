@@ -27,12 +27,12 @@
       border-radius: 30px; 
       padding: 2% 3% 2% 3%; 
       width: 100%;
-      height: 100%;
       max-width: 100%; 
       max-height: 100%; 
       text-align: left; 
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
       line-height: 0.6; 
+      
     }
     
     .top{
