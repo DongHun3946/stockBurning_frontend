@@ -25,7 +25,7 @@
     color: #ffffff;
     background-color: #464646; /* 상자 배경색 */
     border-radius: 30px; /* 테두리 둥글게 */
-    padding: 3% 0% 0% 3%; /* 내부 여백 */
+    padding: 2% 3% 2% 3%; /* 내부 여백 */
     width: 100%; /* 상자 너비 */
     height: 100%;
     max-width: 100%; /* 부모 요소를 초과하지 않도록 제한 */
