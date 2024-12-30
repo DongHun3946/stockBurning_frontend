@@ -40,9 +40,9 @@
     box-sizing: border-box;
   }
   .bottom {
-    display: flex; 
+    display: flex; /*StockInfo.vue와 HotSearch.vue를 가로로 배치*/ 
     justify-content: space-between; 
-    gap: 20px; 
+    gap: 20px;     /*StockInfo.vue와 HotSearch.vue 사이 간격*/ 
     background-color: #68e9a2;  
     border-radius: 30px; 
     padding: 10px; 
