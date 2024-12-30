@@ -1,0 +1,6 @@
+@font-face {
+    font-family: 'MyFont';
+    src: url('/src/assets/fonts/Moneygraphy-Rounded.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
