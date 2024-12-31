@@ -66,6 +66,7 @@ export default {
     selectSuggestion(suggestion) {    // 검색창 입력값을 추천 티커로 변경
       this.ticker = suggestion.stockSymbol;
       this.suggestions = [];
+      this.fetchStockInfo();
     },
     handleTickerInput(event) {   // 입력값을 영문자만 허용하고 소문자를 대문자로 처리
       const input = event.target.value.toUpperCase().replace(/[^A-Z]/g, "");
@@ -184,7 +185,7 @@ export default {
   border: none;
   font-family: 'Inter', sans-serif;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: bold;
   caret-color: #292929;
 }
 

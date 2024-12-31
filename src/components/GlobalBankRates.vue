@@ -9,13 +9,18 @@
           <th>다음 회의</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="bankRates.length > 0">
         <tr v-for="(rate, index) in bankRates" :key="index">
           <td>
             <img :src="'../imgs/' + rate.bankTicker + '.jpg'" :alt="rate.bankTicker" /> {{ rate.bankTicker }}
           </td>
           <td>{{ rate.currentRate }}</td>
           <td>{{ rate.nextMeeting }}</td>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td colspan="3" class="no-data">서버와의 연결이 끊겼습니다.</td>
         </tr>
       </tbody>
     </table>
@@ -59,7 +64,10 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
 }
-
+.no-data {
+  text-align: center;
+  color: rgb(240, 106, 106);
+}
 table {
   width: 100%;
   border-collapse: collapse;

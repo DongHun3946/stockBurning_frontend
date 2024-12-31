@@ -1,7 +1,8 @@
 <template>
   <div class="search-index">
-    <h2>검색량 급등한 티커</h2>
-    <p style="font-size: 20px;">5,842.73</p>
+    <div class="header">
+      <h2>검색량 급상승한 티커</h2>
+    </div>
   </div>
 </template>
 
@@ -13,7 +14,7 @@ export default {
 
 <style scoped>
 .search-index {
-  font-size: 16px;
+  font-size: 1em;
   color: #ffffff;
   background-color: #464646; 
   border-radius: 30px; 
@@ -21,7 +22,11 @@ export default {
   width: 50%; 
   text-align: left; 
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
-  line-height: 0.6; 
+  line-height: 0.3; 
 }
 
+.header {
+  font-size: 0.8em;
+  border-bottom: 3px solid #ffffff;
+}
 </style>

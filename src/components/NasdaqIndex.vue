@@ -3,18 +3,12 @@
     <h2>QQQ
       <span style="font-size: 0.5em;"> (2분 지연)</span>
     </h2>
-    <p 
-      v-if="nasdaqPrice" 
-      style="font-size: 1.3em;" 
-      :style="priceStyle">
+    <p v-if="nasdaqPrice" style="font-size: 1.3em;" :style="priceStyle">
       {{ nasdaqPrice }}
     </p>
     <p v-else style="font-size: 1.3em; font-weight: bold; color:chocolate">서버 API호출실패</p>
 
-    <p 
-      v-if="priceChangePercent" 
-      class="nasdaq-change" 
-      :style="changeStyle">
+    <p v-if="priceChangePercent" class="nasdaq-change" :style="changeStyle">
       <span>{{ priceChangeValue }}</span> ({{ priceChangePercent }})
     </p>
     <p v-else style="font-size: 1.0em; font-weight: bold; color:chocolate">서버 API호출실패</p>
@@ -30,7 +24,6 @@ export default {
       previousPrice: null,          // 전날 종가 저장
       priceChangeValue: null,       // 가격 변동 값 저장
       priceChangePercent: null,     // 가격 변동 퍼센트 저장
-      apiKey: 'ctkkv0hr01qntkqpd110ctkkv0hr01qntkqpd11g', // API 키
     };
   },
   methods: {
@@ -56,14 +49,22 @@ export default {
   },
   computed: {
     priceStyle() {
-      return {
-        color: this.nasdaqPrice > this.previousPrice ? '#d43131' : (this.nasdaqPrice < this.previousPrice ? '#4f87ee' : '#919191')
-      };
+      if (this.nasdaqPrice > this.previousPrice) {
+        return { color: '#d43131' }; // 가격 상승: 빨간색
+      } else if (this.nasdaqPrice < this.previousPrice) {
+        return { color: '#4f87ee' }; // 가격 하락: 파란색
+      } else {
+        return { color: '#919191' }; // 가격 동일: 회색
+      }
     },
     changeStyle() {
-      return {
-        color: this.priceChangeValue > 0 ? '#d43131' : (this.priceChangeValue < 0 ? '#4f87ee' : '#919191')
-      };
+      if (this.priceChangeValue > 0) {
+        return { color: '#d43131' }; // 가격 상승: 빨간색
+      } else if (this.priceChangeValue < 0) {
+        return { color: '#4f87ee' }; // 가격 하락: 파란색
+      } else {
+        return { color: '#919191' }; // 가격 동일: 회색
+      }
     }
   },
   mounted() {
@@ -74,20 +75,20 @@ export default {
 </script>
 
 <style scoped>
-  .nasdaq-index {
-    font-size: 16px;
-    color: #ffffff;
-    background-color: #464646; 
-    border-radius: 30px; 
-    padding: 2% 3% 2% 3%; 
-    width: 50%; 
-    text-align: left; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
-    line-height: 0.6; 
-    box-sizing: border-box;
-  }
+.nasdaq-index {
+  font-size: 20px;
+  color: #ffffff;
+  background-color: #464646;
+  border-radius: 30px;
+  padding: 2% 3% 2% 3%;
+  width: 50%;
+  text-align: left;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  line-height: 0.6;
+  box-sizing: border-box;
+}
 
-  .nasdaq-change {
-    font-weight: bold;
-  }
+.nasdaq-change {
+  font-weight: bold;
+}
 </style>

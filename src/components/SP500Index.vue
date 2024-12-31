@@ -30,7 +30,6 @@ export default {
       previousPrice: null,          // 전날 종가 저장
       priceChangeValue: null,       // 가격 변동 값 저장
       priceChangePercent: null,     // 가격 변동 퍼센트 저장
-      apiKey: 'ctkkv0hr01qntkqpd110ctkkv0hr01qntkqpd11g', // API 키
     };
   },
   methods: {
@@ -68,14 +67,14 @@ export default {
   },
   mounted() {
     this.fetchSpData();
-    setInterval(this.fetchSpData, 120000); // 2분마다 데이터 호출
+    setInterval(this.fetchSpData, 120000);
   }
 };
 </script>
 
 <style scoped>
   .sp500-index {
-    font-size: 16px;
+    font-size: 20px;
     color: #ffffff;
     background-color: #464646; 
     border-radius: 30px; 
