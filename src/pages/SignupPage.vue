@@ -1,18 +1,30 @@
 <template>
   <TopNav/>
-    <div>
-      <h2>회원가입 페이지</h2>
+    <div class="content">
+      <SignupForm />
     </div>
   </template>
   
   <script>
   import TopNav from '../components/TopNav.vue';
+  import SignupForm from '../components/forms/SignUpForm.vue'
 
   export default {
     name: 'SignupPage',
     components:{
-      TopNav
+      TopNav,
+      SignupForm,
     }
   };
   </script>
+  <style scoped>
+  .content {
+    display: flex;       
+    flex-direction: row;
+    gap: 10px;            /* 자식 간 간격 */
+    padding: 10px;
+    margin-top: 8vh;
+    height: calc(100vh - 8vh); /* 화면 높이에서 상단 네비게이션 제외한 영역 */
+  }
+  </style>
   
