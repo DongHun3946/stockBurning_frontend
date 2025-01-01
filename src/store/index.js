@@ -21,7 +21,9 @@ const store = createStore({
           throw new Error("서버로부터 데이터를 받지 못했습니다.");
         }
         commit('SET_STOCK_DATA', fetchedData);
-
+        
+        //axios.post(`http://localhost:8081/api/sendTicker`, {ticker});
+        
         const { data: updatedData } = await axios.post( // POST 요청으로 stockData 서버로 전송 및 업데이트된 데이터 수신
           `http://localhost:8081/scrape/stock/data`,
           {

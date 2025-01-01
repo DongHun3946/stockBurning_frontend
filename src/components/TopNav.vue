@@ -1,31 +1,32 @@
 <template>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <div class="navbar">
+
     <div class="navbar-left">
       <button class="home-button" @click="goToHome">StockBurning</button>
     </div>
+
     <div class="navbar-center">
-      <input
-        type="text"
-        placeholder="티커를 입력해주세요!"
-        class="search-input"
-        v-model="ticker"
-        @input="handleTickerInput"
-        @keyup.enter="fetchStockInfo"
-      />
+      <div class="search-container">
+        <input type="text" 
+          placeholder="티커를 입력해주세요!" 
+          class="search-input" 
+          v-model="ticker" 
+          @input="handleTickerInput"
+          @keyup.enter="fetchStockInfo" />
+        <img src="/imgs/delete.png" 
+          alt="Clear" 
+          class="clear-icon" 
+          @click="clearTicker" />
+      </div>
       <ul v-if="suggestions.length > 0" class="suggestions-list">
-        <li
-          v-for="suggestion in suggestions"
-          :key="suggestion.id"
-          @click="selectSuggestion(suggestion)"
-        >
+        <li v-for="suggestion in suggestions" :key="suggestion.id" @click="selectSuggestion(suggestion)">
           {{ suggestion.stockSymbol }}
         </li>
       </ul>
     </div>
+
+
     <div class="navbar-right">
       <button class="nav-button" @click="goToLogin">로그인</button>
       <button class="nav-button" @click="goToSignup">회원가입</button>
@@ -33,6 +34,7 @@
         <span>a3989957</span>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -57,7 +59,7 @@ export default {
       axios
         .get(`http://localhost:8081/stock/suggestions?prefix=${this.ticker}`)
         .then((response) => {
-          this.suggestions = response.data; 
+          this.suggestions = response.data;
         })
         .catch((error) => {
           console.error("관련 티커를 가져오는 중 에러 발생:", error);
@@ -72,12 +74,22 @@ export default {
       const input = event.target.value.toUpperCase().replace(/[^A-Z]/g, "");
       this.ticker = input;
       this.fetchStockSuggestions();
+
     },
     fetchStockInfo() {
       this.$store.dispatch("fetchStockInfo", this.ticker); // Vuex 액션 호출
     },
-    goToHome() {   // 홈 페이지로 이동
-      this.$router.push("/");
+    clearTicker() {
+      this.ticker = ""; // x 아이콘 클릭 시 ticker 값을 초기화
+    },
+    goToHome() {
+      if(this.$route.path !== "/"){
+        this.$router.push("/").catch(error =>{
+          console.error(error);
+        }) 
+      }
+      else
+        window.location.reload(); //새로고침
     },
     goToLogin() {
       this.$router.push("/login");
@@ -92,6 +104,112 @@ export default {
 <style scoped>
 * {
   box-sizing: border-box;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 25px;
+  /*위 아래 5px 여백, 왼쪽 오른쪽 25px 여백*/
+  top: 0;
+  background-color: #292929;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+  position: fixed;
+  width: 100%;
+  height: 8vh;
+  z-index: 1000;
+}
+
+.home-button {
+  font-size: 24px;
+  color: white;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.navbar-center {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  font-size: 1.1em;
+}
+
+.nav-button {
+  background-color: #292929;
+  border: none;
+  color: white;
+  padding: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-left: 20px;
+  margin-right: 2em;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.nav-button:hover {
+  background-color: #555;
+}
+
+.user-id {
+  margin-left: 15px;
+}
+
+.clear-icon {
+  position: absolute;
+  top: 50%;  /* 검색창 중앙 정렬 */
+  right: 10px; /* 오른쪽 끝에서 약간 여백 */
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.search-container {
+  position: relative;
+  width: 400px; /* 검색창과 동일한 너비 */
+}
+.search-input {
+  width: 100%; /* 부모 요소인 search-container 너비에 맞춤 */
+  height: 40px;
+  padding: 15px;
+  padding-right: 45px; /* Clear 아이콘이 겹치지 않도록 여백 추가 */
+  background-color: #858585;
+  border-radius: 25px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  caret-color: #292929;
+  transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  font-family: 'MyFont', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #292929;
+}
+
+.search-input:focus {
+  outline: none;
+  width: 410px;
+  height: 45px;
+  background-color: #818181;
 }
 
 .suggestions-list {
@@ -139,88 +257,5 @@ export default {
   &::-webkit-scrollbar-thumb:hover {
     background: #5a5a5a;
   }
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 25px;
-  top: 0;
-  background-color: #292929;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-  position: fixed;
-  width: 100%;
-  height: 8%;
-  z-index: 1000;
-}
-
-.home-button {
-  font-size: 24px;
-  color: white;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-style: italic;
-}
-
-.navbar-center {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  position: relative;
-}
-
-.search-input {
-  width: 400px;
-  height: 40px;
-  padding: 15px;
-  background-color: #858585;
-  border-radius: 25px;
-  border: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: bold;
-  caret-color: #292929;
-}
-
-.search-input::placeholder {
-  font-family: 'MyFont', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  color: #292929;
-}
-
-.search-input:focus {
-  outline: none;
-}
-
-.navbar-right {
-  display: flex;
-  align-items: center;
-}
-
-.nav-button {
-  background-color: #444;
-  border: none;
-  color: white;
-  padding: 10px;
-  margin-left: 20px;
-  margin-right: 20px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.nav-button:hover {
-  background-color: #555;
-}
-
-.user-id {
-  margin-left: 15px;
 }
 </style>
