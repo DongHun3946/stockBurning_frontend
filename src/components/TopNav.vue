@@ -115,7 +115,7 @@ export default {
   top: 0;
   background-color: #292929;
   color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   position: fixed;
   width: 100%;
   height: 8vh;
