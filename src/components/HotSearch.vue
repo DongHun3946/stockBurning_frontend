@@ -4,11 +4,12 @@
       <h2>검색량 급상승한 티커</h2>
     </div>
     <div class="content">
+      <!--
       <ul>
         <li v-for="(count, ticker) in mostSearchedTickers" :key="ticker">
           {{ ticker }}: {{ count }}회
         </li>
-      </ul>
+      </ul>-->
     </div>
   </div>
 </template>
@@ -23,8 +24,8 @@ export default {
       mostSearchedTickers: [],
     };
   },
-  mounted() {
-    this.fetchMostSearchedTickers();
+  mounted() { //컴포넌트가 렌더링될 때마다 실행
+    //this.fetchMostSearchedTickers();
   },
   methods: {
     fetchMostSearchedTickers() {

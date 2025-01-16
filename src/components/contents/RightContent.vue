@@ -1,18 +1,18 @@
 <template>
     <div class="right-content">
-      <div class="mid">
-        <StockCommunity />
+      <div class="community">
+        <StockCommunity/>
       </div>
     </div>
   </template>
   
   <script>
-  import  StockCommunity from '../StockCommunity.vue'
+  import StockCommunity from '../StockCommunity.vue';
  
   export default {
     name: 'RightContent',
     components: {
-      StockCommunity
+      StockCommunity,
     }
   }
   </script>
@@ -22,9 +22,10 @@
     /* background-color: rgb(163, 255, 151); */
     flex: 1;
   }
-  .mid{
+  .community{
     display: flex; 
-    justify-content: space-between; 
+    justify-content: space-between;
+    flex-direction: column; 
     /* background-color: #a99aeb; */
     border-radius: 30px; 
     padding: 10px; 

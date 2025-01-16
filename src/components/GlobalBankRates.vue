@@ -12,9 +12,10 @@
       <tbody v-if="bankRates.length > 0">
         <tr v-for="(rate, index) in bankRates" :key="index">
           <td>
-            <img :src="'../imgs/' + rate.bankTicker + '.jpg'" :alt="rate.bankTicker" /> {{ rate.bankTicker }}
+            <img :src="'../imgs/' + rate.bank + '.jpg'" :alt="rate.bankTicker" /> 
+            {{ rate.bank }}
           </td>
-          <td>{{ rate.currentRate }}</td>
+          <td>{{ rate.rate }}</td>
           <td>{{ rate.nextMeeting }}</td>
         </tr>
       </tbody>
@@ -41,11 +42,10 @@ export default {
     axios
       .get("http://localhost:8081/scrape/bank-rates")
       .then((response) => {
-        console.log(response.data);
         this.bankRates = response.data;
       })
       .catch((error) => {
-        console.error("데이터를 불러오는데 실패하였습니다.", error);
+        console.error("bank-rates데이터를 불러오는데 실패하였습니다.", error);
       });
   }
 };

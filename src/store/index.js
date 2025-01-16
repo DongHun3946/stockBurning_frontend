@@ -2,47 +2,85 @@ import { createStore } from 'vuex';
 import axios from 'axios';
 
 const store = createStore({
-  state: {
-    stockData: null, // 전역 상태로 관리할 주식 데이터
+  state: {     // 전역 상태로 관리할 데이터
+    stockData: null, 
+    postData: [],
+    isLoggedIn: false,
+    accessToken: null,
+    nickName: "User",
+    token: null,
   },
-  mutations: { //상태를 수정하는 메소드(상태 변경을 추적할 수 있도록 함)
-    SET_STOCK_DATA(state, data) {
-      state.stockData = data; // 상태 업데이트
+  mutations: { // state를 변경하는 메소드
+    SET_STOCK_DATA(state, stockData) {
+      state.stockData = stockData; 
     },
+    SET_POST_DATA(state, postDTO){
+      state.postData = postDTO;
+    },
+    SET_LOGIN_STATE(state, value){
+      state.isLoggedIn = value;
+    },
+    SET_ACCESS_TOKEN(state, value){
+      state.accessToken = value;
+    },
+    SET_NICK_NAME(state, value){
+      state.nickName = value;
+    }
   },
-  actions: {
-    async fetchStockInfo({ commit }, ticker) { //서버로부터 사용자가 입력한 ticker에 대해 주식데이터를 가져옴
+  actions: { //비동기 작업을 처리하고 mutation을 통해 상태 변경
+    async fetchStockInfo({ commit, state }, ticker) { 
       try {
-        const { data: fetchedData } = await axios.get(
+        const { data: fetchedData } = await axios.get( //db에서 해당 티커 찾기
           `http://localhost:8081/stock?ticker=${ticker}`
         );
         if(!fetchedData){
           window.alert("유효하지 않은 티커입니다. 다시 입력해주세요!");
           throw new Error("서버로부터 데이터를 받지 못했습니다.");
         }
-        commit('SET_STOCK_DATA', fetchedData);
-        
-        //axios.post(`http://localhost:8081/api/sendTicker`, {ticker});
-        
-        const { data: updatedData } = await axios.post( // POST 요청으로 stockData 서버로 전송 및 업데이트된 데이터 수신
-          `http://localhost:8081/scrape/stock/data`,
-          {
-            id: fetchedData.id,
-            stockSymbol: fetchedData.stockSymbol,
-          }
-        );
-        // 업데이트된 데이터로 상태 재설정
-        commit('SET_STOCK_DATA', updatedData);
+        const { stockDataDTO, postDTO } = fetchedData;
 
-        console.log('티커 입력정보 서버로 전송 및 업데이트 완료');
-        console.log(updatedData);
+        commit('SET_STOCK_DATA', stockDataDTO);
+        commit('SET_POST_DATA', postDTO);
+        console.log(postDTO);
+        console.log("여기"+ state.postData);
+        
       } catch (error) {
-        console.error('(티커 정보를 처리하는 중 에러 발생)', error);
+        console.error("티커 정보를 처리하는 중 에러 발생 : ", error);
       }
     },
+    async login({ commit }, {id, password}) {
+      try {
+        const response = await axios.post("http://localhost:8081/api/login", {
+          userId: id,
+          userPw: password,
+        });
+        const getHeader = response.headers.get("Authorization");
+        
+        const accessToken = getHeader.split(' ')[1];
+        
+        axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        commit('SET_ACCESS_TOKEN', accessToken);
+        commit('SET_NICK_NAME', response.data);
+        commit('SET_LOGIN_STATE', true);
+      } catch (error) {
+        console.error("로그인 실패 : ", error);
+        alert("로그인 정보 불일치");
+      }
+    },
+    
+    logout({ commit }) {
+      commit('SET_ACCESS_TOKEN', null);
+      commit('SET_LOGIN_STATE', false);
+      commit('SET_NICK_NAME', "User");
+    }
+
   },
   getters: {
-    stockData: (state) => state.stockData, // 데이터 접근용 getter
+    stockData: (state) => state.stockData, 
+    postData: (state) => state.postData,
+    isLoggedIn: (state) => state.isLoggedIn,
+    accessToken: (state) => state.accessToken,
+    nickName: (state) => state.nickName,
   },
 });
 

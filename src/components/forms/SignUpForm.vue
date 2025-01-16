@@ -73,7 +73,7 @@
         <div class="verification-group">
           <input v-model="verificationCode" @input="validEmailCode" type="text" id="verification-code" />
           <button type="button" @click="verifyCode">확인</button>
-          <button type="button" @click="reSendVerificationCode">재전송</button>
+          <button v-if="isValidEmail" type="button" @click="reSendVerificationCode">재전송</button>
         </div>
       </div>
       <button type="submit" class="submit-button">회원가입 하기</button>
@@ -248,10 +248,22 @@ export default {
       }
     },
     async reSendVerificationCode() {
+      if(!this.email){
+        alert("이메일란을 입력해주세요.");
+        return;
+      }
+      else if(!this.validEmail()){
+        alert("이메일 형식이 알맞지 않습니다.");
+        return;
+      }
+      this.isValidEmail = true;
+      this.validEmailCodeMessage = "전송 중...";
+      this.errorEmailCodeMessage = "";
       try {
         const response = await axios.post("http://localhost:8081/api/signup/send-email", null, {
           params: { email: this.email },
         });
+        
         if (response.data.success) {
           this.validEmailCodeMessage = response.data.message;
           this.errorEmailCodeMessage = "";
@@ -318,14 +330,12 @@ export default {
         return;
       }
       try {
-        console.log("hello");
         const response = await axios.post("http://localhost:8081/api/signup", {
           nickName: this.nickname,
           userId: this.userid,
           userPw: this.password,
           email: this.email
         });
-        console.log(response);
         if (response.status === 201) {
           alert("회원가입 되셨습니다.");
           this.$router.push("/");

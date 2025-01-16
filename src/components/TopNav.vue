@@ -28,13 +28,22 @@
 
 
     <div class="navbar-right">
-      <button class="nav-button" @click="goToLogin">로그인</button>
-      <button class="nav-button" @click="goToSignup">회원가입</button>
+      <button class="nav-button" @click="goToLoginOrLogout">
+        {{!this.$store.getters.isLoggedIn ? '로그인' : '로그아웃'}}
+      </button>
+      <button class="nav-button" @click="goToSignup">
+        회원가입
+      </button>
+      <span style="color:gray">I</span>
       <div class="user-id">
-        <span>a3989957</span>
+        <span>{{ this.$store.getters.nickName }}</span>
       </div>
+      <img v-if="this.$store.getters.nickName!='User'" 
+      src="imgs/downArrow_64.png" class="setting-img" 
+      alt="설정 이미지" @click="settingClick"/>
+     
     </div>
-
+    
   </div>
 </template>
 
@@ -51,6 +60,9 @@ export default {
     };
   },
   methods: {
+    settingClick() {
+      alert("설정");
+    },
     fetchStockSuggestions() { // 추천 검색창에 출력할 종목 받아오기
       if (this.ticker.trim() === "") {
         this.suggestions = [];
@@ -78,6 +90,7 @@ export default {
     },
     fetchStockInfo() {
       this.$store.dispatch("fetchStockInfo", this.ticker); // Vuex 액션 호출
+      this.suggestions = [];
     },
     clearTicker() {
       this.ticker = ""; // x 아이콘 클릭 시 ticker 값을 초기화
@@ -91,8 +104,15 @@ export default {
       else
         window.location.reload(); //새로고침
     },
-    goToLogin() {
-      this.$router.push("/login");
+    goToLoginOrLogout() {
+      if(!this.$store.getters.isLoggedIn){
+        this.$router.push("/login");
+      }
+      else{
+        this.$store.dispatch("logout");
+        this.$router.push("/");
+      }
+        
     },
     goToSignup() {
       this.$router.push("/signup");
@@ -166,7 +186,8 @@ export default {
 }
 
 .user-id {
-  margin-left: 15px;
+  margin-left: 25px;
+  margin-right: 25px;
 }
 
 .clear-icon {
@@ -258,4 +279,11 @@ export default {
     background: #5a5a5a;
   }
 }
+.setting-img {
+  margin-right: 20px;
+}
+.setting-img:hover{
+  cursor: pointer;
+}
+
 </style>
