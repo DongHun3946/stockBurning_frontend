@@ -8,16 +8,9 @@
 
     <div class="navbar-center">
       <div class="search-container">
-        <input type="text" 
-          placeholder="티커를 입력해주세요!" 
-          class="search-input" 
-          v-model="ticker" 
-          @input="handleTickerInput"
+        <input type="text" placeholder="티커를 입력해주세요!" class="search-input" v-model="ticker" @input="handleTickerInput"
           @keyup.enter="fetchStockInfo" />
-        <img src="/imgs/delete.png" 
-          alt="Clear" 
-          class="clear-icon" 
-          @click="clearTicker" />
+        <img src="/imgs/delete.png" alt="Clear" class="clear-icon" @click="clearTicker" />
       </div>
       <ul v-if="suggestions.length > 0" class="suggestions-list">
         <li v-for="suggestion in suggestions" :key="suggestion.id" @click="selectSuggestion(suggestion)">
@@ -29,26 +22,26 @@
 
     <div class="navbar-right">
       <button class="nav-button" @click="goToLoginOrLogout">
-        {{!this.$store.getters.isLoggedIn ? '로그인' : '로그아웃'}}
+        {{ !this.$store.getters.isLoggedIn ? '로그인' : '로그아웃' }}
       </button>
       <button class="nav-button" @click="goToSignup">
         회원가입
       </button>
-      <span style="color:gray">I</span>
-      <div class="user-id">
-        <span>{{ this.$store.getters.nickName }}</span>
+      <div class="userInfo" v-show="this.$store.getters.isLoggedIn">
+        <span style="color:gray">I</span>
+        <div class="user-id">
+          <span>{{ this.$store.getters.nickName }}</span>
+        </div>
+        <img src="/imgs/downArrow_64.png" class="setting-img" alt="설정 이미지" @click="settingClick" />
+        <SettingModal :isVisible="isModalVisible" />
       </div>
-      <img v-if="this.$store.getters.nickName!='User'" 
-      src="imgs/downArrow_64.png" class="setting-img" 
-      alt="설정 이미지" @click="settingClick"/>
-     
     </div>
-    
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import SettingModal from './forms/settingForm.vue'
 
 export default {
   name: "TopNav",
@@ -57,11 +50,15 @@ export default {
       ticker: "",        // 검색창 입력값
       suggestions: [],   // 추천 검색어 목록
       apikey: "ctkf5upr01qntkqovocgctkf5upr01qntkqovod0",
+      isModalVisible: false,
     };
+  },
+  components: {
+    SettingModal
   },
   methods: {
     settingClick() {
-      alert("설정");
+      this.isModalVisible = !this.isModalVisible;
     },
     fetchStockSuggestions() { // 추천 검색창에 출력할 종목 받아오기
       if (this.ticker.trim() === "") {
@@ -69,7 +66,7 @@ export default {
         return;
       }
       axios
-        .get(`http://localhost:8081/stock/suggestions?prefix=${this.ticker}`)
+        .get(`http://localhost:8081/api/stock/suggestions?prefix=${this.ticker}`)
         .then((response) => {
           this.suggestions = response.data;
         })
@@ -96,23 +93,25 @@ export default {
       this.ticker = ""; // x 아이콘 클릭 시 ticker 값을 초기화
     },
     goToHome() {
-      if(this.$route.path !== "/"){
-        this.$router.push("/").catch(error =>{
+      if (this.$route.path !== "/") {
+        this.$router.push("/").catch(error => {
           console.error(error);
-        }) 
+        })
       }
-      else
-        window.location.reload(); //새로고침
+      else {
+        this.$router.push("/");
+      }
+
     },
     goToLoginOrLogout() {
-      if(!this.$store.getters.isLoggedIn){
+      if (!this.$store.getters.isLoggedIn) {
         this.$router.push("/login");
       }
-      else{
+      else {
         this.$store.dispatch("logout");
         this.$router.push("/");
       }
-        
+
     },
     goToSignup() {
       this.$router.push("/signup");
@@ -167,7 +166,10 @@ export default {
   align-items: center;
   font-size: 1.1em;
 }
-
+.userInfo {
+  display: flex;
+  flex-direction: row;
+}
 .nav-button {
   background-color: #292929;
   border: none;
@@ -192,8 +194,10 @@ export default {
 
 .clear-icon {
   position: absolute;
-  top: 50%;  /* 검색창 중앙 정렬 */
-  right: 10px; /* 오른쪽 끝에서 약간 여백 */
+  top: 50%;
+  /* 검색창 중앙 정렬 */
+  right: 10px;
+  /* 오른쪽 끝에서 약간 여백 */
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
@@ -202,13 +206,17 @@ export default {
 
 .search-container {
   position: relative;
-  width: 400px; /* 검색창과 동일한 너비 */
+  width: 400px;
+  /* 검색창과 동일한 너비 */
 }
+
 .search-input {
-  width: 100%; /* 부모 요소인 search-container 너비에 맞춤 */
+  width: 100%;
+  /* 부모 요소인 search-container 너비에 맞춤 */
   height: 40px;
   padding: 15px;
-  padding-right: 45px; /* Clear 아이콘이 겹치지 않도록 여백 추가 */
+  padding-right: 45px;
+  /* Clear 아이콘이 겹치지 않도록 여백 추가 */
   background-color: #858585;
   border-radius: 25px;
   border: none;
@@ -279,11 +287,12 @@ export default {
     background: #5a5a5a;
   }
 }
+
 .setting-img {
   margin-right: 20px;
 }
-.setting-img:hover{
+
+.setting-img:hover {
   cursor: pointer;
 }
-
 </style>

@@ -30,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+//import apiClient from '@/middleware/axios';
 
 export default {
   name: "BankRates",
@@ -40,7 +41,7 @@ export default {
   },
   mounted() {
     axios
-      .get("http://localhost:8081/scrape/bank-rates")
+      .get("http://localhost:8081/api/scrape/bank-rates")
       .then((response) => {
         this.bankRates = response.data;
       })

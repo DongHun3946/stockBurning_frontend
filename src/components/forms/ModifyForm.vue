@@ -1,7 +1,8 @@
 <template>
-  <div class="registration-form">
-    <h1>StockBurning</h1>
+  <div class="modify-form">
+    <h1>내 정보 수정</h1>
     <form @submit.prevent="submitRegistration">
+
       <div class="form-group">
         <label for="nickname">닉네임
           <span v-if="errorNickNameMessage" class="error-message">{{ errorNickNameMessage }}
@@ -16,41 +17,12 @@
       </div>
 
       <div class="form-group">
-        <label for="id">아이디
-          <span v-if="errorUserIdMessage" class="error-message">{{ errorUserIdMessage }}
-          </span>
-          <span v-if="validUserIdMessage" class="valid-message">{{ validUserIdMessage }}
-          </span>
-        </label>
+        <label>아이디</label>
         <div class="id-group">
-          <input v-model="userid" @input="validUserId" type="text" id="id" maxlength="20" />
-          <button type="button" @click="checkUserIdDuplicated" style="width: 25%;">중복 확인</button>
+          <input v-model="userid" type="text" id="userid" disabled />
         </div>
+      </div>
 
-      </div>
-      <div class="form-group">
-        <label for="password">비밀번호 (8~25자리의 영문, 숫자, 특수기호 포함)
-          <br>
-          <span v-if="errorPasswordMessage && !validPasswordMessage" class="error-message">{{ errorPasswordMessage }}
-          </span>
-          <span v-if="validPasswordMessage && !errorPasswordMessage" class="valid-message">{{ validPasswordMessage }}
-          </span>
-        </label>
-
-        <input v-model="password" @input="validPassword" type="password" id="password" />
-      </div>
-      <div class="form-group">
-        <label for="confirm-password">비밀번호 확인
-          <br>
-          <span v-if="errorConfirmPasswordMessage && !validConfirmPasswordMessage" class="error-message">{{
-            errorConfirmPasswordMessage }}
-          </span>
-          <span v-if="validConfirmPasswordMessage && !errorConfirmPasswordMessage" class="valid-message">{{
-            validConfirmPasswordMessage }}
-          </span>
-        </label>
-        <input v-model="confirmPassword" @input="validConfirmPassword" type="password" id="confirm-password" />
-      </div>
       <div class="form-group">
         <label for="email">이메일
           <span v-if="errorEmailMessage && !validEmailMessage" class="error-message">{{ errorEmailMessage }}
@@ -60,9 +32,11 @@
         </label>
         <div class="email-group">
           <input v-model="email" @input="validEmail" type="email" id="email" />
-          <button type="button" :disabled="isButtonDisabled" :class="{ 'disabled-button' : isButtonDisabled }" @click="sendVerificationCode">인증번호 전송</button>
+          <button type="button" :disabled="isButtonDisabled" :class="{ 'disabled-button': isButtonDisabled }"
+            @click="sendVerificationCode">인증번호 전송</button>
         </div>
       </div>
+
       <div class="form-group">
         <label for="verification-code">인증번호 입력
           <span v-if="errorEmailCodeMessage && !validEmailCodeMessage" class="error-message">{{ errorEmailCodeMessage }}
@@ -76,15 +50,15 @@
           <button v-if="isValidEmail" type="button" @click="reSendVerificationCode">재전송</button>
         </div>
       </div>
-      <button type="submit" class="submit-button">회원가입 하기</button>
+
+      <button type="submit" class="submit-button">수정하기</button>
+      <button type="button" class="cacel-button" @click="cacelModify">취소</button>
     </form>
     <Modal :isVisible="isModalVisible" 
     :option="modalOption"
-    :titleMessage="modalTitleMessage" 
-    :mainMessage="modalMainMessage"
-    :subMessage="modalSubMessage"
-    @close="closeModal" />
-   
+    :titleMessage="modalTitleMessage" :mainMessage="modalMainMessage"
+      :subMessage="modalSubMessage" @close="closeModal" />
+
   </div>
 </template>
 
@@ -93,47 +67,37 @@ import axios from "axios";
 import Modal from './ModalForm.vue';
 
 export default {
-  name: "RegistrationForm",
+  name: "ModifyForm",
   components: {
     Modal,
   },
   data() {
     return {
-      nickname: "",
-      userid: "",
-      password: "",
-      confirmPassword: "",
-      email: "",
+      nickname: this.$store.getters.nickName,
+      userid: this.$store.getters.userId,
+      email: this.$store.getters.userEmail,
       verificationCode: "",
       isButtonDisabled: false,
 
       errorNickNameMessage: "",
       validNickNameMessage: "",
-      isValidNickName: false,
+      isValidNickName: true,
 
       errorUserIdMessage: "",
       validUserIdMessage: "",
-      isValidUserId: false,
-
-      errorPasswordMessage: "",
-      validPasswordMessage: "",
-      isValidPassword: false,
-
-      errorConfirmPasswordMessage: "",
-      validConfirmPasswordMessage: "",
-      isValidConfirmPassword: false,
+      isValidUserId: true,
 
       errorEmailMessage: "",
       validEmailMessage: "",
-      isValidEmail: false,
+      isValidEmail: true,
 
       errorEmailCodeMessage: "",
       validEmailCodeMessage: "",
-      isValidEmailCode: false,
+      isValidEmailCode: true,
 
       isModalVisible: false,
-      modalOption: "",
-      modalTitleMessage:"",
+      modalOption: 0,
+      modalTitleMessage: "",
       modalMainMessage: "",
       modalSubMessage: "",
     };
@@ -149,47 +113,11 @@ export default {
       this.errorUserIdMessage = "";
       this.validUserIdMessage = "";
     },
-    validPassword() {
-      const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=]).{8,25}$/;
-      this.isValidPassword = false;
-      this.isValidConfirmPassword = false;
-      this.validConfirmPasswordMessage = "";
-      this.errorConfirmPasswordMessage = "";
-      if (this.password.length !== 0 && !passwordRegex.test(this.password)) {
-        this.validPasswordMessage = "";
-        this.errorPasswordMessage = "8~25자의 영문, 숫자, 특수문자를 포함해야합니다.";
-      }
-      if (passwordRegex.test(this.password)) {
-        this.validPasswordMessage = "사용 가능합니다."
-        this.errorPasswordMessage = "";
-        this.isValidPassword = true;
-      }
-      if (this.confirmPassword === this.password && this.isValidPassword) {
-        this.validConfirmPasswordMessage = "일치합니다."
-        this.errorConfirmPasswordMessage = "";
-        this.isValidConfirmPassword = true;
-      }
-      if(this.confirmPassword.length !==0 && this.confirmPassword !== this.Password){
-        this.validConfirmPasswordMessage = "";
-        this.errorConfirmPasswordMessage = "불일치합니다.";
-        this.isValidConfirmPassword = false;
-      }
-    },
-    validConfirmPassword() {
-      if (this.confirmPassword === this.password && this.isValidPassword) {
-        this.validConfirmPasswordMessage = "일치합니다."
-        this.errorConfirmPasswordMessage = "";
-        this.isValidConfirmPassword = true;
-      } else {
-        this.validConfirmPasswordMessage = "";
-        this.errorConfirmPasswordMessage = "불일치합니다.";
-        this.isValidConfirmPassword = false;
-      }
-    },
     validEmail() {
       this.validEmailMessage = "";
       this.errorEmailMessage = "";
       this.isValidEmail = false;
+      this.isValidEmailCode = false;
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(this.email)) {
         return false;
@@ -201,11 +129,16 @@ export default {
       this.isValidEmailCode = false;
     },
     async checkNickNameDuplicated() {
+      if (this.nickname === this.$store.getters.nickName) {
+        this.validNickNameMessage = "현재 사용 중인 닉네임과 동일합니다.";
+        this.errorNickNameMessage = "";
+        this.isValidNickName = true;
+        return;
+      }
       try {
         const response = await axios.get("http://localhost:8081/api/signup/check-nickname", {
           params: { nickname: this.nickname }
         });
-        console.log(response.data);
         if (response.data.available) {
           this.validNickNameMessage = response.data.message;
           this.errorNickNameMessage = "";
@@ -273,11 +206,11 @@ export default {
       }
     },
     async reSendVerificationCode() {
-      if(!this.email){
+      if (!this.email) {
         alert("이메일란을 입력해주세요.");
         return;
       }
-      else if(!this.validEmail()){
+      else if (!this.validEmail()) {
         alert("이메일 형식이 알맞지 않습니다.");
         return;
       }
@@ -288,7 +221,7 @@ export default {
         const response = await axios.post("http://localhost:8081/api/signup/send-email", null, {
           params: { email: this.email },
         });
-        
+
         if (response.data.success) {
           this.validEmailCodeMessage = response.data.message;
           this.errorEmailCodeMessage = "";
@@ -322,21 +255,23 @@ export default {
         console.log(error);
       }
     },
-    showModal(option, titleMessage, mainMessage, subMessage){
+    cacelModify(){
+      this.$router.push("/");
+    },
+    showModal(option, titleMessage, mainMessage, subMessage) {
       this.isModalVisible = true;
       this.modalOption = option;
       this.modalTitleMessage = titleMessage;
       this.modalMainMessage = mainMessage;
       this.modalSubMessage = subMessage;
+  
     },
-    closeModal(){
+    closeModal() {
       this.isModalVisible = false;
     },
     async submitRegistration() {
       console.log(this.isValidNickName);
       console.log(this.isValidUserId);
-      console.log(this.isValidPassword);
-      console.log(this.isValidConfirmPassword);
       console.log(this.isValidEmail);
       console.log(this.isValidEmailCode);
 
@@ -348,14 +283,6 @@ export default {
         this.showModal(1, "주의", "아이디를 다시 확인해주세요.", "");
         return;
       }
-      if (!this.isValidPassword) {
-        this.showModal(1, "주의", "비밀번호를 다시 확인해주세요.", "");
-        return;
-      }
-      if (!this.isValidConfirmPassword) {
-        this.showModal(1, "주의", "비밀번호 확인란을 다시 확인해주세요.", "");
-        return;
-      }
       if (!this.isValidEmail) {
         this.showModal(1, "주의", "이메일을 다시 확인해주세요.", "");
         return;
@@ -365,27 +292,16 @@ export default {
         return;
       }
       try {
-        const response = await axios.post("http://localhost:8081/api/signup", {
+        const response = await axios.put(`http://localhost:8081/api/modify/user/${this.userid}`, {
           nickName: this.nickname,
-          userId: this.userid,
-          userPw: this.password,
-          email: this.email
+          email: this.email,
         });
-        if (response.status === 201) {
-          this.showModal("환영합니다!", this.nickname + "님 회원가입을 축하합니다!<br>가입하신 ID는 " + this.userid+ "입니다.")
-          this.$router.push("/");
+        
+        if (response.status === 200) {
+          this.showModal(2, "", this.nickname + "님의 개인정보가 수정되었습니다 ");
         }
       } catch (error) {
-        if (error.response) {
-          // 서버 응답이 있을 경우
-          alert(`회원가입 실패 : ${error.response.data}`);
-        } else if (error.request) {
-          // 서버로 요청은 했으나 응답이 없을 경우
-          alert(`서버 응답을 받을 수 없습니다. 네트워크 오류가 발생했습니다.`);
-        } else {
-          // 요청 중 오류 발생
-          alert(`회원가입 요청 중 문제가 발생했습니다: ${error.message}`);
-        }
+        alert("개인정보 수정 실패 : ", error);
       }
     }
   },
@@ -397,10 +313,10 @@ export default {
   box-sizing: border-box;
 }
 
-.registration-form {
+.modify-form {
   width: 24%;
-  height: 81vh;
-  margin: 0 auto;
+  height: 65vh;
+  margin: 4% auto;
   background-color: #464646;
   padding: 20px;
   border-radius: 15px;
@@ -448,11 +364,16 @@ input:focus {
 }
 
 .nickname-group,
-.id-group,
 .email-group,
+.id-group,
 .verification-group {
   display: flex;
   gap: 10px;
+}
+
+#userid {
+  background-color: #3a3a3a;
+  color: white;
 }
 
 #verification-code {
@@ -480,10 +401,25 @@ button:hover {
 }
 
 button.disabled-button {
-  background-color: #6c757d; /* 비활성화 상태 색상 */
-  cursor: not-allowed; /* 비활성화된 커서 스타일 */
+  background-color: #6c757d;
+  /* 비활성화 상태 색상 */
+  cursor: not-allowed;
+  /* 비활성화된 커서 스타일 */
 }
+
 .submit-button {
+  width: 100%;
+  height: 50px;
+  margin-top: 10px;
+  color: #353535;
+  font-size: 17px;
+  font-weight: bold;
+  background-color: #6283f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
+}
+
+.cacel-button {
   width: 100%;
   height: 50px;
   margin-top: 10px;
@@ -496,7 +432,11 @@ button.disabled-button {
 }
 
 .submit-button:hover {
-  background-color: #6e6e6e;
+  background-color: #435eb8;
+}
+
+.cacel-button:hover {
+  background-color: #757575;
 }
 
 .error-message {

@@ -2,10 +2,11 @@
   <div class="community">
 
     <div class="top">
-      <div class="top-left" v-if="stockData">
-        <span>{{stockData.stockSymbol}} 커뮤니티</span>
+      <div class="top-left">
+        <span v-if="stockData">{{ stockData.stockSymbol }} 커뮤니티</span>
+        <span v-else>StockBurning 커뮤니티</span>
       </div>
-      <div class="top-right" v-if="stockData">
+      <div class="top-right">
         <button class="top-button">전체글</button> I
         <button class="top-button">베스트글</button>
       </div>
@@ -13,58 +14,55 @@
 
     <div class="mid" v-if="postData">
       <!-- 게시글 출력 -->
-        <article v-for="(post, index) in postData" :key="index" class="post">
-          <div class="profile-image">
-            <img src="/imgs/profile_32.png" alt="profile_img">
+      <article v-for="(post, index) in postData" :key="index" class="post">
+        <div class="profile-image">
+          <img src="/imgs/profile_32.png" alt="profile_img">
+        </div>
+        <div class="post-content">
+          <div class="nickNameAndTime">
+            <div class="nickName">{{ post.nickName }}</div>
+            <div class="createdTime">{{ getTimeAgo(post.createdAt) }} </div>
           </div>
-          <div class="post-content">
-            <div class="nickNameAndTime">
-              <div class="nickName">{{ post.nickName }}</div>
-              <div class="createdTime">{{ getTimeAgo(post.createdAt) }} </div>
-            </div>
-            <div class="contentAndImage">
-              <div class="content">{{ post.content }}</div>
-              
-              <div class="image"></div>
-            </div>
-            <div class="likeAndComment">
-              <div class="like-button">
-                <img src="/imgs/thumbs-up_16.png" alt="like_img" @click="setLike">
-              </div>
-              <div class="like">{{ post.likes }} </div>
-              <div class="comment-button">
-                <img src="/imgs/comment2_16.png" alt="comment_img" @click="setComment">
-              </div>
-              <div class="commentCount">{{ post.commentCount }}</div>
-            </div>
+          <div class="contentAndImage">
+            <div class="content">{{ post.content }}</div>
+
+            <div class="image"></div>
           </div>
-          
-        </article>
+          <div class="likeAndComment">
+            <div class="like-button">
+              <img src="/imgs/thumbs-up_16.png" alt="like_img" @click="setLike">
+            </div>
+            <div class="like">{{ post.likes }} </div>
+            <div class="comment-button">
+              <img src="/imgs/comment2_16.png" alt="comment_img" @click="setComment">
+            </div>
+            <div class="commentCount">{{ post.commentCount }}</div>
+          </div>
+        </div>
+
+      </article>
     </div>
 
 
     <div class="bottom">
       <form @submit.prevent="createPost">
         <div class="bottom-top">
-          <textarea v-model="postContent" 
-          class="custom-textarea" 
-          rows="3" 
-          :placeholder="placeholderText" 
-          :disabled="!isLoggedIn"
-          required></textarea>
+          <textarea v-model="postContent" class="custom-textarea" rows="3" :placeholder="placeholderText"
+            :disabled="!isLoggedIn" required></textarea>
         </div>
 
         <div class="bottom-bottom">
           <div class="image-button">
-            <img src="/imgs/image_32.png" style="width: 20px; height: 20px;" alt="사진이미지">
+            <img src="/imgs/image_32.png" style="width: 20px; height: 20px;" alt="사진이미지" @click="setImage"
+              :disabled="!isLoggedIn">
           </div>
-          <button class="up-button">
+          <button class="up-button" @click="setUp" :disabled="!isLoggedIn">
             ↑상승
           </button>
-          <button class="down-button">
+          <button class="down-button" @click="setDown" :disabled="!isLoggedIn">
             ↓하락
           </button>
-          <button type="submit" class="post-button">
+          <button type="submit" class="post-button" :disabled="!isLoggedIn">
             등록
           </button>
         </div>
@@ -76,7 +74,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+//import axios from 'axios';
+import apiClient from '../middleware/axios'
 import { mapGetters } from 'vuex';
 
 export default {
@@ -84,38 +83,51 @@ export default {
   data() {
     return {
       postContent: "",
+      up: false,
+      down: false,
     }
   },
   computed: { //특정 값을 계산하여 반환함
     ...mapGetters(["stockData", "postData"]),
-    getNickName(){
+    getNickName() {
       return this.$store.getters.nickName;
     },
     isLoggedIn() {
       return this.$store.getters.isLoggedIn;
     },
-    placeholderText(){
+    placeholderText() {
       return this.isLoggedIn ? this.getNickName + "님의 의견을 남겨보세요!" : "로그인 후 의견을 남길 수 있습니다!"
     },
   },
   methods: {
-    setLike(){
+    
+    setLike() {
       alert("좋아요 +1");
     },
-    setComment(){
+    setComment() {
       alert("댓글 작성");
+    },
+    setImage() {
+      alert("이미지 첨부");
+    },
+    setUp() {
+      if(!this.down){
+        this.up = true;
+        this.postContent += ' <button class="up-button" disabled>↑상승</button>';
+      }
+      //this.$store.commit('INCREASE_STOCK_UP');
+    },
+    setDown() {
+      if(!this.up){
+        this.down = true;
+        this.postContent += ' <button class="down-button" disabled>↓하락</button>';
+      }
     },
     getStockData() {
       return this.$store.getters.stockData;
     },
-    async createPost(){
-      
-      if(this.getStockData() === null){
-        alert("티커를 입력해주세요");
-        return;
-      }
-        
-      if(!this.postContent.trim()){
+    async createPost() {
+      if (!this.postContent.trim()) {
         alert("내용을 입력해주세요!");
         return;
       }
@@ -123,23 +135,22 @@ export default {
         content: this.postContent,
         imagePath: null,
         opinion: null,
-        stockSymbol: this.getStockData().id,
+        stockSymbol: this.getStockData() && this.getStockData().id ? this.getStockData().id : null,
       }
-      try{
-        const response = await axios.post(
+
+      try {
+        const response = await apiClient.post(
           "http://localhost:8081/api/posts/create",
-           postCreateRequest
+          postCreateRequest,
         );
-        
-        if(response.status === 200){
-          this.postContent="";
-        } else{
-          alert("게시글 등록에 실패했습니다. 다시 시도해주세요");
-        }
-      }catch(error){
-        console.error("community post error :" + error);
+        if (response.status === 200) {
+          this.postContent = "";
+        } 
+      } catch (error) {
+        console.log(error);
       }
     },
+
     getTimeAgo(createdAt) {
       const now = new Date();
       const createdTime = new Date(createdAt);
@@ -230,100 +241,127 @@ export default {
   /* background-color: #7fa1c5; */
   flex: 1;
   margin: 10px 0;
-  overflow-y:scroll; /* 세로 스크롤 활성화 */
-  max-height: 77%; /* 높이 제한 */
+  overflow-y: scroll;
+  /* 세로 스크롤 활성화 */
+  max-height: 77%;
+  /* 높이 제한 */
 }
+
 .mid::-webkit-scrollbar {
-  width: 10px; /* 스크롤바 너비 */
+  width: 10px;
+  /* 스크롤바 너비 */
 }
 
 .mid::-webkit-scrollbar-thumb {
-  background: #a0a0a0; /* 스크롤바 색상 */
-  border-radius: 10px; /* 둥근 모서리 */
+  background: #bbb1ab;
+  /* 스크롤바 색상 */
+  border-radius: 10px;
+  /* 둥근 모서리 */
 }
 
 .mid::-webkit-scrollbar-thumb:hover {
-  background: #888888; /* 스크롤바에 마우스 올렸을 때 색상 */
+  background: #92867b;
+  /* 스크롤바에 마우스 올렸을 때 색상 */
   cursor: pointer;
 }
+
 .mid::-webkit-scrollbar-thumb:active {
-  background: #1f1f1f;
+  background: #776a60;
 }
+
 .mid::-webkit-scrollbar-track {
-  background: #464646; /* 트랙 배경색 */
+  background: #464646;
+  /* 트랙 배경색 */
   border-radius: 10px;
 }
+
 .post {
   display: flex;
   flex-direction: row;
-  background-color: #3a3a3a;
+  background-color: #818181;
+  font-weight: 600;
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 10px;
 }
+
 .profile-image {
   margin-right: 10px;
   /* background-color: #dd5757; */
 }
+
 .post-content {
   /* background-color: #c9ca7b; */
   flex: 1;
   display: flex;
   flex-direction: column;
-  color: #2e2e2e;
 }
-.nickNameAndTime{
+
+.nickNameAndTime {
   display: flex;
   flex-direction: row;
   /*background-color: #da9554; */
 }
+
 .nickName {
   flex: 1.5;
   font-weight: bold;
   color: #5ad342;
   /*background-color: #defa3d; */
 }
+
 .createdTime {
   flex: 1;
   font-weight: bold;
   color: #1f1f1f;
   /*background-color: #94653a; */
 }
+
 .contentAndImage {
   /*background-color: #3cdf57; */
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
-}          
+}
+
 .content {
   flex: 1;
-  color: #000000;
+  color: #2a3236;
   margin-bottom: 10px;
 }
-.image{
+
+.image {
   flex: 1;
 }
+
 .likeAndComment {
   display: flex;
   flex-direction: row;
-  /*background-color: #8e54da;*/ 
+  /*background-color: #8e54da;*/
 }
+
 .like-button {
-  flex:0.7;
+  flex: 0.7;
 }
-.like-button:hover{
+
+.like-button:hover {
   cursor: pointer;
 }
+
 .like {
-  flex:1;
+  flex: 1;
   color: #000000;
   /*background-color: #0c3c96;*/
 }
+
 .comment-button {
-  flex:0.7;
+  flex: 0.7;
 }
+
 .comment-button:hover {
   cursor: pointer;
 }
+
 .commentCount {
   flex: 9;
   color: #000000;
@@ -414,9 +452,11 @@ export default {
 .image-button {
   margin-left: 10px;
 }
+
 .image-button:hover {
   cursor: pointer;
 }
+
 .up-button {
   margin-left: 90px;
   width: 60px;
@@ -429,10 +469,12 @@ export default {
   box-shadow: 0 4px 3px rgba(0, 0, 0, 0.5);
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
+
 .up-button:hover {
   cursor: pointer;
   transform: scale(1.1);
 }
+
 .down-button {
   margin-right: 120px;
   width: 60px;
@@ -446,10 +488,12 @@ export default {
   box-shadow: 0 4px 3px rgba(0, 0, 0, 0.5);
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
+
 .down-button:hover {
   cursor: pointer;
   transform: scale(1.1);
 }
+
 .post-button {
   margin-right: 10px;
   width: 60px;
@@ -462,6 +506,7 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
+
 .post-button:hover {
   cursor: pointer;
   transform: scale(1.1);

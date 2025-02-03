@@ -20,6 +20,10 @@ export default {
     LeftContent,
     CenterContent,
     RightContent
+  },
+  mounted() {
+    this.$store.dispatch("fetchDefaultInfo");
+    this.$store.dispatch("refresh");
   }
 }
 </script>

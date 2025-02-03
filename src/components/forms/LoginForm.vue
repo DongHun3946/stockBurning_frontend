@@ -9,7 +9,11 @@
       <button class="login-button" @click="login">
         로그인
       </button>
-
+      <div class="options">
+          <span class="findId" @click="findid">아이디 찾기</span>I
+          <span class="findPw" @click="findpw">비밀번호 찾기</span>I 
+          <span class="signUp" @click="signup">회원가입</span>
+      </div>
       <p class="social-login-text">소셜 로그인</p>
       <img src="/imgs/kakao_login_medium_wide.png" alt="Kakao Img" class="kakao-button" />
     </div>
@@ -38,8 +42,19 @@ export default {
         id: this.userid,
         password: this.userpw,
       });
+      this.$store.commit('SET_STOCK_DATA', null);
       this.$router.push("/");
-      console.log(this.$store.getters.isLoggedIn);
+
+     
+    },
+    findid(){
+      this.$router.push("/findid");
+    },
+    findpw(){
+      this.$router.push("/findpw");
+    },
+    signup(){
+      this.$router.push("/signup");
     },
   },
 }
@@ -121,8 +136,8 @@ export default {
 }
 
 .social-login-text {
-  margin: 20px 0 10px;
-  font-size: 14px;
+  margin: 30px 0 10px;
+  font-size: 16px;
   font-weight: bold;
   text-align: left;
   color: #cccccc;
@@ -133,5 +148,26 @@ export default {
   height: 100%;
   cursor: pointer;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 14px;
+  color: #9b9a9a;
+  margin-top: 10px;
+}
+
+.findId:hover {
+  cursor: pointer;
+}
+
+.findPw:hover {
+  cursor: pointer;
+}
+
+.signUp:hover{
+  cursor: pointer;
 }
 </style>
