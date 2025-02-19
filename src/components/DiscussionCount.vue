@@ -1,107 +1,176 @@
-
 <template>
   <div class="discuss-count">
-    <div class="title">
-      <span v-if="stockData">{{ stockData.stockSymbol }}&nbsp;</span>
-      <span v-else>StockBurning&nbsp;</span>
-      <span>커뮤니티 의견 수 변화(1일 단위)</span>
+    <div class="title" v-if="weeklyPostCountData && stockData">
+      <span v-if="stockData">{{ stockData.stockSymbol }}&nbsp; 커뮤니티 의견 수 변화(1일 단위) </span>
+      <br>
     </div>
-    <div class="chart">
+    <div class="chart" v-if="weeklyPostCountData && stockData">
       <canvas ref="discussChart"></canvas> <!-- 차트를 렌더링할 캔버스 -->
+    </div>
+    <div class="default" v-else>
+      <Discuss_part1 />
+      <Discuss_part2 />
     </div>
   </div>
 </template>
 
 <script>
-/*
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, LineController } from "chart.js";
 import { mapGetters } from 'vuex';
+import Chart from "chart.js/auto";
+import Discuss_part1 from './Discuss_part1.vue';
+import Discuss_part2 from './Discuss_part2.vue';
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement, LineController); 
-*/
 export default {
   name: 'DiscussCount',
-  /*
+  data() {
+    return {
+      chart: null,
+    };
+  },
+  components: {
+    Discuss_part1,
+    Discuss_part2,
+  },
   computed: {
-    ...mapGetters(["stockData"]), // Vuex에서 stockData 가져오기
+    ...mapGetters(["stockData", "weeklyPostCountData"]), // Vuex에서 데이터 가져오기
   },
-
   watch: {
-    stockData(newData) {
-      if (newData) {
-        this.renderChart(newData);
-      }
-    }
+    weeklyPostCountData: {
+      handler(newData) {
+        if (this.chart) { //기존 차트가 있으면
+          this.updateChart(newData);
+        } else {          //기존 차트가 없으면
+          this.renderChart(newData);
+        }
+      },
+      deep: true, //객체 내부 변경을 감지함
+    },
   },
-
   mounted() {
-    // stockData가 초기값이 있을 경우 차트를 렌더링
-    if (this.stockData) {
-      this.renderChart(this.stockData);
-    }
+    this.watchTicker();
   },
-
   methods: {
-    renderChart(stockData) {
-      const ctx = this.$refs.discussChart.getContext('2d');
-      
-      // 예시: stockData에서 의견 수에 대한 데이터를 차트로 표시
-      const data = {
-        labels: stockData.dates, // 날짜 리스트
-        datasets: [
-          {
-            //label: '커뮤니티 의견 수',
-            data: stockData.commentCounts, // 댓글 수 데이터
-            borderColor: '#77ca51', // 라인 색
-            fill: false, // 채우기 여부
-            tension: 0.1, // 라인의 곡률
+    
+    watchTicker() {
+      this.$watch(
+        () => this.$route.query, // 전체 query 객체 감시
+        (newQuery) => {
+          const newTicker = newQuery.ticker;
+          const newType = newQuery.type || "allPost"; // 기본값 설정
+          if (newTicker) {
+            if (!this.weeklyPostCountData && newTicker !== "nasdaq") {
+              this.$store.dispatch('fetchStockInfo', { ticker: newTicker, type: newType });
+            }
           }
-        ]
-      };
-      
-      // 차트 생성
-      new ChartJS(ctx, {
-        type: 'line',
-        data: data,
+        },
+        { immediate: true } // mounted 시 즉시 실행
+      );
+    },
+    
+    extractChartData(data) {
+      const labels = data.map(entry => entry.date);
+      const counts = data.map(entry => entry.count || 0);
+      const bullishCounts = data.map(entry => entry.bullishCnt || 0);
+      const bearishCounts = data.map(entry => entry.bearishCnt || 0);
+
+      return { labels, counts, bullishCounts, bearishCounts };
+    },
+    renderChart(data) {
+      if (!this.$refs.discussChart || !data) return;
+
+      const ctx = this.$refs.discussChart.getContext("2d");
+      const { labels, counts, bullishCounts, bearishCounts } = this.extractChartData(data);
+
+      this.chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "게시글 수",
+              data: counts,
+              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderWidth: 3,
+              fill: true,
+
+            },
+            {
+              label: "상승 의견 수",
+              data: bullishCounts,
+              borderColor: "rgba(54, 162, 235, 1)",
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderWidth: 3,
+              fill: true,
+            },
+            {
+              label: "하락 의견 수",
+              data: bearishCounts,
+              borderColor: "rgba(255, 99, 132, 1)",
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              borderWidth: 3,
+              fill: true,
+            },
+          ],
+        },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
-            /*
-            title: {
-              display: true,
-              text: '1일 단위 커뮤니티 의견 수 변화',
+            legend: {
+              labels: {
+                usePointStyle: true,
+                boxWidth: 7,
+                boxHeight: 7,
+                font: {
+                  size: 14, // 라벨 폰트 크기
+                  family: "'Arial', sans-serif", // 폰트 종류
+                },
+                color: '#ffffff',
+              },
             },
-            
-            tooltip: {
-              callbacks: {
-                label: function(tooltipItem) {
-                  return `댓글 수: ${tooltipItem.raw}`;
-                }
-              }
-            }
           },
           scales: {
             x: {
-              title: {
-                display: true,
-                text: '날짜'
+              ticks: {
+                color: "#d4d2d2",
+                font: {
+                  weight: "bold",
+                },
               }
             },
             y: {
-              title: {
-                display: true,
-                text: '댓글 수'
+              ticks: {
+                color: "#d4d2d2",
+                font: {
+                  weight: "bold",  // X축 라벨 폰트 굵기 (bold)
+                },
               },
-              min: 0,
-            }
-          }
-        }
-      });
-    }
-  } */
-};
+              beginAtZero: true,
+            },
+          },
+        },
 
+      });
+    },
+    updateChart(newData) {
+      if (!this.chart) {
+        return;
+      }
+      this.chart.destroy();
+
+      const { labels, counts, bullishCounts, bearishCounts } = this.extractChartData(newData);
+      this.chart.data.labels = labels;
+      this.chart.data.datasets[0].data = counts;
+      this.chart.data.datasets[1].data = bullishCounts;
+      this.chart.data.datasets[2].data = bearishCounts;
+      this.renderChart(newData);
+    },
+  },
+};
 </script>
+
+
 
 <style scoped>
 .discuss-count {
@@ -125,7 +194,7 @@ export default {
   font-size: 20px;
   font-weight: bold;
   text-align: left;
-  color: #ffffff;
+  color: #b4c5ee;
   display: flex;
   align-items: center;
   /*background-color: #a54646;*/
@@ -137,5 +206,16 @@ export default {
   box-sizing: border-box;
   max-height: 87.5%;
   /*background-color: #bb6036;*/
+}
+
+.default {
+  flex: 7;
+  font-size: 1em;
+  box-sizing: border-box;
+  max-height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  /* background-color: #bb6036; */
 }
 </style>

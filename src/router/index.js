@@ -11,7 +11,12 @@ import FindPwPage from '../pages/FindPwPage.vue';
 const routes = [
   {
     path: '/',
-    component: HomePage 
+    redirect: '/stock'
+  },
+  {
+    path: '/stock',
+    component: HomePage,
+    props: route => ({ ticker: route.query.ticker, type: route.query.type })
   },
   { 
     path: '/login', 

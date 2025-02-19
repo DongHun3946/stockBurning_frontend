@@ -6,7 +6,11 @@
       <p class="modal-content-main">{{ mainMessage }}</p>
       <p class="modal-content-sub">{{ subMessage }}</p>
       <p v-if="option === 4" class="progress-text">{{ progressMessage }}</p>
-      <button v-show="option !== 4" @click="handleButtonClick">확인</button>
+      <div class = "buttons">
+        <button v-show="option !== 4" @click="handleButtonClick">확인</button>
+        <button v-show="option === 5" @click="handleButtonCancel">취소</button>
+      </div>
+      
     </div>
   </div>
 </template>
@@ -17,6 +21,7 @@ export default {
             2 : 성공 (타이틀 : 초록색) 확인버튼 누르면 모달창 닫히고 홈으로 이동 및 로그아웃됨
             3 : 실패 (타이틀 : 빨강색) 확인버튼 누르면 모달창 닫히고 홈으로 이동
             4 : 애니메이션 효과부여
+            5 : 삭제버튼(타이틀 : 빨강색) 확인버튼 누르면 삭제, 취소버튼 누르면 모달창만 닫힘
   */
   data() {
     return {
@@ -49,7 +54,12 @@ export default {
         this.$store.dispatch('logout');
       } else if (this.option === 3) {
         this.completeModal();
+      } else if(this.option === 5){
+        this.$emit('delete');
       }
+    },
+    handleButtonCancel() {
+      this.closeModal();
     },
     startAnimation() {
       if (this.intervalId) return;
@@ -106,7 +116,8 @@ export default {
   border-radius: 10px;
   text-align: center;
   font-size: bold;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 
+            0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .modal-content-title {
@@ -115,9 +126,12 @@ export default {
 }
 
 .modal-content-main {
+  font-size: 20px;
   font-weight: bold;
 }
-
+.modal-content-sub {
+  font-size: 15px;
+}
 .progress-text {
   font-size: 20px;
   font-weight: bold;
@@ -128,12 +142,22 @@ button {
   padding: 10px 20px;
   background-color: #636363;
   color: white;
+  font-weight: bold;
+  font-size: 15px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
   background-color: #a3a3a3;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
 }
 </style>

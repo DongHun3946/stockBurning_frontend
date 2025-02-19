@@ -143,6 +143,7 @@ export default {
   font-weight: bold;
   border-bottom: 3px solid #ffffff;
   font-size: 18px;
+  /* background-color: #00A449;*/
 }
 
 .header-ticker {

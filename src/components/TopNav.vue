@@ -85,8 +85,13 @@ export default {
       this.fetchStockSuggestions();
 
     },
-    fetchStockInfo() {
-      this.$store.dispatch("fetchStockInfo", this.ticker); // Vuex 액션 호출
+    async fetchStockInfo() {
+      
+      //this.$store.dispatch("fetchStockInfo", this.ticker); // Vuex 액션 호출
+      this.$router.push({ path: '/stock', query: { ticker: this.ticker, type: "allPost" } });
+      await axios.post(
+        `http://localhost:8081/api/stock/search?ticker=${this.ticker}`,
+      );
       this.suggestions = [];
     },
     clearTicker() {
@@ -94,14 +99,17 @@ export default {
     },
     goToHome() {
       if (this.$route.path !== "/") {
-        this.$router.push("/").catch(error => {
+        this.$router.push("/").then(() => {
+          window.location.reload(); // 페이지 새로고침
+        }).catch(error => {
           console.error(error);
-        })
+        });
       }
       else {
-        this.$router.push("/");
+        this.$router.push("/").then(() => {
+          window.location.reload(); // 페이지 새로고침
+        });
       }
-
     },
     goToLoginOrLogout() {
       if (!this.$store.getters.isLoggedIn) {
@@ -166,10 +174,12 @@ export default {
   align-items: center;
   font-size: 1.1em;
 }
+
 .userInfo {
   display: flex;
   flex-direction: row;
 }
+
 .nav-button {
   background-color: #292929;
   border: none;

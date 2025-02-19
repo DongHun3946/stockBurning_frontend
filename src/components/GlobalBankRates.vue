@@ -1,6 +1,6 @@
 <template>
   <div class="bank-rates">
-    <h3>전 세계 중앙은행 금리</h3>
+    <h3 class="title">전 세계 중앙은행 금리</h3>
     <table class="rates-table">
       <thead>
         <tr>
@@ -65,6 +65,9 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
 }
+.title {
+  color: #b4c5ee;
+}
 .no-data {
   text-align: center;
   color: rgb(240, 106, 106);
@@ -82,11 +85,11 @@ td {
 
 thead {
   font-weight: bold;
-  border-bottom: 2px solid #ffffff;
+  border-bottom: 3px solid #ffffff;
 }
 
 tr {
-  border-bottom: 1px solid #b8b8b8;
+  border-bottom: 2px solid #b8b8b8;
 }
 
 td img {

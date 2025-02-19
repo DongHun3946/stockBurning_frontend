@@ -41,9 +41,10 @@ apiClient.interceptors.response.use(
         }
       }
 
-      // 그 외 401 에러 (예: 로그인 필요)
+      /*
       alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-      window.location.href = '/login'; // 로그인 페이지로 리다이렉트
+      window.location.href = '/login'; 
+      */
     }
     return Promise.reject(error); // 그 외 에러는 그대로 반환
   }
